@@ -1,12 +1,6 @@
 # Command line, says string number from 1 (low E) to 6 (high E),
 # and then the note to find on that string.
 
-# Edit these to focus on certain notes and strings
-NOTES = %w(A Ab A# B Bb C C# Db D D# E Eb F F# G G# Gb)
-NOTES = %w(F# Ab)
-STRINGS = %w(1 2 3 4 5 6)
-STRINGS = %w(5 6)
-
 class Array
   def shuffle!
     size.downto(1) { |n| push delete_at(rand(n)) }
@@ -49,6 +43,17 @@ class Question
   
 end
 
+
+###################################
+
+print "Enter notes to study: "
+NOTES = gets.split(' ')
+print "Enter strings: "
+STRINGS = gets.split(' ')
+
+Voice.say("Get ready!")
+Kernel.sleep 3
+
 questions = []
 NOTES.each do |n|
   STRINGS.each do |s|
@@ -66,4 +71,5 @@ questions.each do |q|
   puts
   Kernel.sleep 4
 end
+
 Voice.say("All done!")  
