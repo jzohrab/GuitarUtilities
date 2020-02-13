@@ -1,0 +1,6 @@
+# Always test the following notes on these strings:
+:persistent:
+  - :string: 3
+    :note: Bb
+  - :string: 4
+    :note: Db
