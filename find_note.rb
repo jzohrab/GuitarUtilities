@@ -100,7 +100,7 @@ questions.each do |q|
   Voice.say(q.to_s())
   puts
   Kernel.sleep 3
-  Voice.say(neck.fret(q.string, q.note))
+  # Voice.say(neck.fret(q.string, q.note))
   play(neck, q.string, q.note)
   Kernel.sleep 1
 end
