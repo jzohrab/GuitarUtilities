@@ -37,12 +37,12 @@ end
 module Guitar
 
   STD_TUNING = {
-    1 => { :midi => 88 - 12, :note => 'E' },
-    2 => { :midi => 83 - 12, :note => 'B' },
-    3 => { :midi => 79 - 12, :note => 'G' },
-    4 => { :midi => 74 - 12, :note => 'D' },
-    5 => { :midi => 69 - 12, :note => 'A' },
-    6 => { :midi => 64 - 12, :note => 'E' },
+    1 => { :midi => 64, :note => 'E' },
+    2 => { :midi => 59, :note => 'B' },
+    3 => { :midi => 55, :note => 'G' },
+    4 => { :midi => 50, :note => 'D' },
+    5 => { :midi => 45, :note => 'A' },
+    6 => { :midi => 40, :note => 'E' },
   }
 
   class Neck
