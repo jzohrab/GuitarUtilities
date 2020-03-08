@@ -18,10 +18,10 @@ def parse_args(args)
 
     opts.separator ""
     opts.separator "Data options:"
-    opts.on("-s T", Integer, "Start time") do |t|
+    opts.on("-s T", Float, "Start time") do |t|
       options[:start] = t
     end
-    opts.on("-e T", Integer, "End time") do |t|
+    opts.on("-e T", Float, "End time") do |t|
       options[:end] = t
     end
     opts.on("-r R", Float, "Rate (e.g. 0.5)") do |s|
@@ -54,22 +54,30 @@ def set_quicktime(option, value)
   `#{cmd}`
 end
 
+class CtrlCException < StandardError
+end
+
 ######################################
 # MAIN
 
+trap("SIGINT") { raise CtrlCException.new() }
 options = parse_args(ARGV)
 
-set_quicktime("current time", options[:start])
-set_quicktime("rate", options[:rate])
+begin
+  set_quicktime("current time", options[:start])
+  set_quicktime("rate", options[:rate])
 
-if !options[:end].nil? then
-  length = ((options[:end] - options[:start])/options[:rate]).to_i
-  options[:count].times.each do |i|
-    puts "Repetition #{i + 1}"
-    Kernel.sleep(length)
-    set_quicktime("current time", options[:start])
+  if !options[:end].nil? then
+    length = ((options[:end] - options[:start])/options[:rate]).to_f
+    options[:count].times.each do |i|
+      puts "Repetition #{i + 1}"
+      Kernel.sleep(length)
+      set_quicktime("current time", options[:start])
+    end
   end
+
+rescue CtrlCException => e
+  puts "Quitting"
+ensure
+  set_quicktime("rate", 0)
 end
-
-set_quicktime("rate", 0)
-
