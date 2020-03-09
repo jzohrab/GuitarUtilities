@@ -54,6 +54,14 @@ def set_quicktime(option, value)
   `#{cmd}`
 end
 
+# Play the clip, then stop
+def play_clip(clip)
+  set_quicktime("current time", clip[:start])
+  set_quicktime("rate", clip[:rate])
+  Kernel.sleep(clip[:duration])
+  set_quicktime("rate", 0)
+end
+
 class CtrlCException < StandardError
 end
 
@@ -63,19 +71,21 @@ end
 trap("SIGINT") { raise CtrlCException.new() }
 options = parse_args(ARGV)
 
+clip = {
+  start: options[:start],
+  duration: 5,
+  rate: options[:rate]
+}
+
+if !options[:end].nil? then
+  clip[:duration] = ((options[:end] - options[:start])/options[:rate]).to_f
+end
+
 begin
-  set_quicktime("current time", options[:start])
-  set_quicktime("rate", options[:rate])
-
-  if !options[:end].nil? then
-    length = ((options[:end] - options[:start])/options[:rate]).to_f
-    options[:count].times.each do |i|
-      puts "Repetition #{i + 1}"
-      Kernel.sleep(length)
-      set_quicktime("current time", options[:start])
-    end
+  options[:count].times.each do |i|
+    puts "Repetition #{i + 1}"
+    play_clip(clip)
   end
-
 rescue CtrlCException => e
   puts "Quitting"
 ensure
