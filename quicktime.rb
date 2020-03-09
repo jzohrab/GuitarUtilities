@@ -130,11 +130,8 @@ end
 
 def make_menu_item(sym, clip)
   func = lambda do
-    puts "BEFORE"
-    puts "NIL????" if clip.nil?
-    puts clip.inspect
     print_clip(clip)
-    print "Enter #{sym}: "
+    print "Enter new #{sym}: "
     clip[sym] = gets().to_f
     print_clip(clip)
     play_clip(clip)
