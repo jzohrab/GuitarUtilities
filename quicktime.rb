@@ -70,7 +70,7 @@ end
 def play_clip(clip)
   set_quicktime("current time", clip[:start])
   set_quicktime("rate", clip[:rate])
-  Kernel.sleep(clip[:duration])
+  Kernel.sleep(clip[:duration] / clip[:rate])
   set_quicktime("rate", 0)
 end
 
@@ -85,12 +85,12 @@ options = parse_args(ARGV)
 
 clip = {
   start: options[:start],
-  duration: options[:duration] / options[:rate],
+  duration: options[:duration],
   rate: options[:rate]
 }
 
 if !options[:end].nil? then
-  clip[:duration] = ((options[:end] - options[:start])/options[:rate]).to_f
+  clip[:duration] = (options[:end] - options[:start]).to_f
 end
 
 begin
