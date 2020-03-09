@@ -2,6 +2,61 @@
 # Perhaps useful for transcription.
 
 require 'optparse'
+require 'io/console'
+
+
+# The video clip to play.  Needs to be a global variable b/c the main
+# menu is built using lambdas which bind to this variable.  There are
+# other ways to write this but this is fine for now.
+$clip = {}
+
+
+######################################
+# Ctrl-C handling
+
+class CtrlCException < StandardError
+end
+
+trap("SIGINT") { raise CtrlCException.new() }
+
+
+######################################
+# Quicktime
+
+def get_quicktime(option)
+  cmd = "osascript -e 'tell application \"QuickTime Player\" to get #{option} of document 1'"
+  ret = `#{cmd}`.strip
+  # puts "GOT #{option}: #{ret}"
+  ret
+end
+
+def set_quicktime(option, value)
+  cmd = "osascript -e 'tell application \"QuickTime Player\" to set #{option} of document 1 to #{value}'"
+  # puts cmd
+  `#{cmd}`
+end
+
+# Play the clip, then stop
+def play_clip(clip)
+  set_quicktime("current time", clip[:start])
+  set_quicktime("rate", clip[:rate])
+  Kernel.sleep(clip[:duration] / clip[:rate])
+  set_quicktime("rate", 0)
+end
+
+# Loop until Ctrl-C
+def loop_clip(clip)
+  begin
+    while true
+      play_clip(clip)
+    end
+  rescue CtrlCException => e
+    puts "Quitting"
+  ensure
+    set_quicktime("rate", 0)
+  end
+end
+
 
 ######################################
 # Options
@@ -44,42 +99,25 @@ def parse_args(args)
 end
 
 
-######################################
-# Quicktime
+def get_clip(options)
+  clip = {
+    start: options[:start],
+    duration: options[:duration],
+    rate: options[:rate]
+  }
 
-def get_quicktime(option)
-  cmd = "osascript -e 'tell application \"QuickTime Player\" to get #{option} of document 1'"
-  ret = `#{cmd}`.strip
-  # puts "GOT #{option}: #{ret}"
-  ret
-end
-
-def set_quicktime(option, value)
-  cmd = "osascript -e 'tell application \"QuickTime Player\" to set #{option} of document 1 to #{value}'"
-  # puts cmd
-  `#{cmd}`
-end
-
-# Play the clip, then stop
-def play_clip(clip)
-  set_quicktime("current time", clip[:start])
-  set_quicktime("rate", clip[:rate])
-  Kernel.sleep(clip[:duration] / clip[:rate])
-  set_quicktime("rate", 0)
-end
-
-# Loop until Ctrl-C
-def loop_clip(clip)
-  begin
-    while true
-      play_clip(clip)
-    end
-  rescue CtrlCException => e
-    puts "Quitting"
-  ensure
-    set_quicktime("rate", 0)
+  if !options[:end].nil? then
+    clip[:duration] = (options[:end] - options[:start]).to_f
   end
+
+  clip
 end
+
+
+options = parse_args(ARGV)
+$clip = get_clip(options)
+
+
 
 ######################################
 # Menu
@@ -92,6 +130,10 @@ end
 
 def make_menu_item(sym, clip)
   func = lambda do
+    puts "BEFORE"
+    puts "NIL????" if clip.nil?
+    puts clip.inspect
+    print_clip(clip)
     print "Enter #{sym}: "
     clip[sym] = gets().to_f
     print_clip(clip)
@@ -102,11 +144,11 @@ end
 
 
 MENU_ITEMS = [
-  make_menu_item(:start, clip),
-  make_menu_item(:duration, clip),
-  make_menu_item(:rate, clip),
-  ['play', lambda { play_clip(clip) } ],
-  ['loop', lambda { puts "Hit Ctrl-C to stop loop"; loop_clip(clip) } ],
+  make_menu_item(:start, $clip),
+  make_menu_item(:duration, $clip),
+  make_menu_item(:rate, $clip),
+  ['play', lambda { print_clip($clip); play_clip($clip) } ],
+  ['loop', lambda { puts "Hit Ctrl-C to stop loop"; loop_clip($clip) } ],
   ['quit', lambda { puts "no-op" } ]
 ].map do |s, lam|
   {
@@ -120,44 +162,36 @@ MENU_OPTIONS = MENU_ITEMS.map { |h| h[:display] }.join(', ')
 MENU_HASH = MENU_ITEMS.map { |h| [ h[:letter], h[:action] ] }.to_h
 
 
-class CtrlCException < StandardError
-end
 
+######################################
+# MAIN
+
+def main()
+  # Play the clip when first entering the loop.
+  user_menu_selection = 'p'
+
+  while user_menu_selection != 'q'
+    action = MENU_HASH[user_menu_selection]
+    if !action.nil? then
+      action.call
+    else
+      puts "Unknown option '#{user_menu_selection}'"
+    end
+    puts
+    puts "Menu: #{MENU_OPTIONS}"
+    user_menu_selection = STDIN.getch
+    puts user_menu_selection
+  end
+
+  puts "Quitting"
+end
 
 ######################################
 # ENTRYPOINT
 
-trap("SIGINT") { raise CtrlCException.new() }
-options = parse_args(ARGV)
-
-clip = {
-  start: options[:start],
-  duration: options[:duration],
-  rate: options[:rate]
-}
-
-if !options[:end].nil? then
-  clip[:duration] = (options[:end] - options[:start]).to_f
+begin
+  main()
+rescue Exception => e
+  puts "Error: #{e}"
+  set_quicktime("rate", 0)
 end
-
-
-require 'io/console'
-print_clip(clip)
-
-# Play the clip when first entering the loop.
-c = 'p'
-
-while c != 'q'
-  action = MENU_HASH[c]
-  if !action.nil? then
-    action.call
-  else
-    puts "Unknown option"
-  end
-
-  puts
-  puts "Menu: #{MENU_OPTIONS}"
-  c = STDIN.getch
-  puts c
-end
-puts "Quitting"
