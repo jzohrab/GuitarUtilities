@@ -32,12 +32,6 @@ def parse_args(args)
     opts.on("-r R", Float, "Rate (e.g. 0.5)") do |s|
       options[:rate] = s
     end
-    opts.on("-l L", Float, "Loop length") do |s|
-      options[:loop] = s
-    end
-    opts.on("-n N", Integer, "Loop count") do |n|
-      options[:count] = n
-    end
     
     opts.separator ""
     opts.on_tail("-h", "--help", "Show this message") do
