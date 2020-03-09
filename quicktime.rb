@@ -9,7 +9,7 @@ require 'optparse'
 # Return a hash describing the options.
 def parse_args(args)
   options = {
-    :start => get_quicktime("time"),
+    :start => get_quicktime("time").to_f,
     :rate => 0.5,
     :duration => 5,
     :count => 5
@@ -20,7 +20,7 @@ def parse_args(args)
 
     opts.separator ""
     opts.separator "Data options:"
-    opts.on("-s T", Float, "Start time (default #{options[:start]})") do |t|
+    opts.on("-s T", Float, "Start time (default to current player time)") do |t|
       options[:start] = t
     end
     opts.on("-e T", Float, "End time") do |t|
@@ -55,7 +55,7 @@ end
 
 def get_quicktime(option)
   cmd = "osascript -e 'tell application \"QuickTime Player\" to get #{option} of document 1'"
-  ret = `#{cmd}`
+  ret = `#{cmd}`.strip
   puts "GOT #{option}: #{ret}"
   ret
 end
