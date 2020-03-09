@@ -10,9 +10,8 @@ require 'optparse'
 def parse_args(args)
   options = {
     :start => get_quicktime("time").to_f,
-    :rate => 0.5,
-    :duration => 5,
-    :count => 5
+    :duration => 2,
+    :rate => 1
   }
 
   opt_parser = OptionParser.new do |opts|
@@ -26,10 +25,10 @@ def parse_args(args)
     opts.on("-e T", Float, "End time") do |t|
       options[:end] = t
     end
-    opts.on("-d T", Float, "Duration") do |t|
+    opts.on("-d T", Float, "Duration (default #{options[:duration]})") do |t|
       options[:duration] = t
     end
-    opts.on("-r R", Float, "Rate (e.g. 0.5)") do |s|
+    opts.on("-r R", Float, "Rate (default #{options[:rate]})") do |s|
       options[:rate] = s
     end
     
@@ -102,26 +101,7 @@ def make_menu_item(sym, clip)
 end
 
 
-class CtrlCException < StandardError
-end
-
-######################################
-# MAIN
-
-trap("SIGINT") { raise CtrlCException.new() }
-options = parse_args(ARGV)
-
-clip = {
-  start: options[:start],
-  duration: options[:duration],
-  rate: options[:rate]
-}
-
-if !options[:end].nil? then
-  clip[:duration] = (options[:end] - options[:start]).to_f
-end
-
-menu_items = [
+MENU_ITEMS = [
   make_menu_item(:start, clip),
   make_menu_item(:duration, clip),
   make_menu_item(:rate, clip),
@@ -136,16 +116,39 @@ menu_items = [
   }
 end
 
-menu_options = menu_items.map { |h| h[:display] }.join(', ')
-menu_hash = menu_items.map { |h| [ h[:letter], h[:action] ] }.to_h
+MENU_OPTIONS = MENU_ITEMS.map { |h| h[:display] }.join(', ')
+MENU_HASH = MENU_ITEMS.map { |h| [ h[:letter], h[:action] ] }.to_h
+
+
+class CtrlCException < StandardError
+end
+
+
+######################################
+# ENTRYPOINT
+
+trap("SIGINT") { raise CtrlCException.new() }
+options = parse_args(ARGV)
+
+clip = {
+  start: options[:start],
+  duration: options[:duration],
+  rate: options[:rate]
+}
+
+if !options[:end].nil? then
+  clip[:duration] = (options[:end] - options[:start]).to_f
+end
+
 
 require 'io/console'
 print_clip(clip)
 
+# Play the clip when first entering the loop.
 c = 'p'
 
 while c != 'q'
-  action = menu_hash[c]
+  action = MENU_HASH[c]
   if !action.nil? then
     action.call
   else
@@ -153,7 +156,7 @@ while c != 'q'
   end
 
   puts
-  puts "Menu: #{menu_options}"
+  puts "Menu: #{MENU_OPTIONS}"
   c = STDIN.getch
   puts c
 end
