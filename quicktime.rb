@@ -9,7 +9,8 @@ require 'optparse'
 # Return a hash describing the options.
 def parse_args(args)
   options = {
-    :speed => 0.5,
+    :start => get_quicktime("time"),
+    :rate => 0.5,
     :duration => 5,
     :count => 5
   }
@@ -19,7 +20,7 @@ def parse_args(args)
 
     opts.separator ""
     opts.separator "Data options:"
-    opts.on("-s T", Float, "Start time") do |t|
+    opts.on("-s T", Float, "Start time (default #{options[:start]})") do |t|
       options[:start] = t
     end
     opts.on("-e T", Float, "End time") do |t|
@@ -52,6 +53,13 @@ end
 
 ######################################
 
+def get_quicktime(option)
+  cmd = "osascript -e 'tell application \"QuickTime Player\" to get #{option} of document 1'"
+  ret = `#{cmd}`
+  puts "GOT #{option}: #{ret}"
+  ret
+end
+
 def set_quicktime(option, value)
   cmd = "osascript -e 'tell application \"QuickTime Player\" to set #{option} of document 1 to #{value}'"
   # puts cmd
@@ -77,7 +85,7 @@ options = parse_args(ARGV)
 
 clip = {
   start: options[:start],
-  duration: options[:duration],
+  duration: options[:duration] / options[:rate],
   rate: options[:rate]
 }
 
