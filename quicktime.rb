@@ -128,12 +128,16 @@ menu_items = [
   ['play', lambda { play_clip(clip) } ],
   ['loop', lambda { puts "Hit Ctrl-C to stop loop"; loop_clip(clip) } ],
   ['quit', lambda { puts "no-op" } ]
-]
-menu_options = menu_items.map { |s, lam| "#{s[0]})#{s[1..-1]}" }
-menu_hash = menu_items.to_h
-menu_items.each do |s, lam|
-  menu_hash[s[0]] = lam
+].map do |s, lam|
+  {
+    letter: s[0],
+    display: "#{s[0]})#{s[1..-1]}",
+    action: lam
+  }
 end
+
+menu_options = menu_items.map { |h| h[:display] }.join(', ')
+menu_hash = menu_items.map { |h| [ h[:letter], h[:action] ] }.to_h
 
 require 'io/console'
 print_clip(clip)
@@ -141,14 +145,16 @@ print_clip(clip)
 c = 'p'
 
 while c != 'q'
-  if menu_hash[c].nil? then
+  action = menu_hash[c]
+  if !action.nil? then
+    action.call
+  else
     puts "Unknown option"
-    c = 'p'
   end
-  menu_hash[c].call
 
   puts
-  puts "Menu: #{menu_options.join(', ')}"
+  puts "Menu: #{menu_options}"
   c = STDIN.getch
+  puts c
 end
 puts "Quitting"
