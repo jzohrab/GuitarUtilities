@@ -74,6 +74,11 @@ def play_clip(clip)
   set_quicktime("rate", 0)
 end
 
+def print_clip(clip)
+  tmp = [:start, :duration, :rate].map { |s| "#{s.to_s}: #{clip[s].round(2)}" }.join(', ')
+  puts "Clip: #{tmp}"
+end
+
 class CtrlCException < StandardError
 end
 
@@ -92,6 +97,8 @@ clip = {
 if !options[:end].nil? then
   clip[:duration] = (options[:end] - options[:start]).to_f
 end
+
+print_clip(clip)
 
 begin
   options[:count].times.each do |i|
