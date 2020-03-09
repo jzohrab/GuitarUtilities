@@ -52,11 +52,12 @@ end
 
 
 ######################################
+# Quicktime
 
 def get_quicktime(option)
   cmd = "osascript -e 'tell application \"QuickTime Player\" to get #{option} of document 1'"
   ret = `#{cmd}`.strip
-  puts "GOT #{option}: #{ret}"
+  # puts "GOT #{option}: #{ret}"
   ret
 end
 
@@ -74,10 +75,38 @@ def play_clip(clip)
   set_quicktime("rate", 0)
 end
 
+# Loop until Ctrl-C
+def loop_clip(clip)
+  begin
+    while true
+      play_clip(clip)
+    end
+  rescue CtrlCException => e
+    puts "Quitting"
+  ensure
+    set_quicktime("rate", 0)
+  end
+end
+
+######################################
+# Menu
+
 def print_clip(clip)
   tmp = [:start, :duration, :rate].map { |s| "#{s.to_s}: #{clip[s].round(2)}" }.join(', ')
   puts "Clip: #{tmp}"
 end
+
+
+def make_menu_item(sym, clip)
+  func = lambda do
+    print "Enter #{sym}: "
+    clip[sym] = gets().to_f
+    print_clip(clip)
+    play_clip(clip)
+  end
+  [sym.to_s, func]
+end
+
 
 class CtrlCException < StandardError
 end
@@ -98,15 +127,34 @@ if !options[:end].nil? then
   clip[:duration] = (options[:end] - options[:start]).to_f
 end
 
+menu_items = [
+  make_menu_item(:start, clip),
+  make_menu_item(:duration, clip),
+  make_menu_item(:rate, clip),
+  ['play', lambda { play_clip(clip) } ],
+  ['loop', lambda { puts "Hit Ctrl-C to stop loop"; loop_clip(clip) } ],
+  ['quit', lambda { puts "no-op" } ]
+]
+menu_options = menu_items.map { |s, lam| "#{s[0]})#{s[1..-1]}" }
+menu_hash = menu_items.to_h
+menu_items.each do |s, lam|
+  menu_hash[s[0]] = lam
+end
+
+require 'io/console'
 print_clip(clip)
 
-begin
-  options[:count].times.each do |i|
-    puts "Repetition #{i + 1}"
-    play_clip(clip)
+c = 'p'
+
+while c != 'q'
+  if menu_hash[c].nil? then
+    puts "Unknown option"
+    c = 'p'
   end
-rescue CtrlCException => e
-  puts "Quitting"
-ensure
-  set_quicktime("rate", 0)
+  menu_hash[c].call
+
+  puts
+  puts "Menu: #{menu_options.join(', ')}"
+  c = STDIN.getch
 end
+puts "Quitting"
