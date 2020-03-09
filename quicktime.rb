@@ -10,6 +10,7 @@ require 'optparse'
 def parse_args(args)
   options = {
     :speed => 0.5,
+    :duration => 5,
     :count => 5
   }
 
@@ -23,6 +24,9 @@ def parse_args(args)
     end
     opts.on("-e T", Float, "End time") do |t|
       options[:end] = t
+    end
+    opts.on("-d T", Float, "Duration") do |t|
+      options[:duration] = t
     end
     opts.on("-r R", Float, "Rate (e.g. 0.5)") do |s|
       options[:rate] = s
@@ -73,7 +77,7 @@ options = parse_args(ARGV)
 
 clip = {
   start: options[:start],
-  duration: 5,
+  duration: options[:duration],
   rate: options[:rate]
 }
 
