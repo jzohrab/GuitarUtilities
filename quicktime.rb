@@ -48,15 +48,20 @@ end
 def loop_clip(clip)
   begin
     while true
+      print '.'
       play_clip(clip)
     end
   rescue CtrlCException => e
-    puts "Quitting"
+    puts
   ensure
     set_quicktime("rate", 0)
   end
 end
 
+
+def update_start(clip)
+  clip[:start] = get_quicktime("time").to_f
+end
 
 ######################################
 # Options
@@ -123,41 +128,47 @@ $clip = get_clip(options)
 # Menu
 
 def print_clip(clip)
-  tmp = [:start, :duration, :rate].map { |s| "#{s.to_s}: #{clip[s].round(2)}" }.join(', ')
+  tmp = [:start, :duration, :rate].
+          map { |s| "#{s.to_s}: #{clip[s].round(2)}" }.join(', ')
   puts "Clip: #{tmp}"
 end
 
 
-def make_menu_item(sym, clip)
-  func = lambda do
-    print_clip(clip)
-    print "Enter new #{sym}: "
-    clip[sym] = gets().to_f
-    print_clip(clip)
-    play_clip(clip)
-  end
-  [sym.to_s, func]
+def make_edit_menu_item(sym, clip)
+  [
+    sym.to_s[0],
+    "edit #{sym.to_s}",
+    lambda { print "Enter new #{sym}: "; clip[sym] = gets().to_f }
+  ]
 end
 
 
 MENU_ITEMS = [
-  make_menu_item(:start, $clip),
-  make_menu_item(:duration, $clip),
-  make_menu_item(:rate, $clip),
-  ['play', lambda { print_clip($clip); play_clip($clip) } ],
-  ['loop', lambda { puts "Hit Ctrl-C to stop loop"; loop_clip($clip) } ],
-  ['quit', lambda { puts "no-op" } ]
-].map do |s, lam|
+  make_edit_menu_item(:start, $clip),
+  make_edit_menu_item(:duration, $clip),
+  make_edit_menu_item(:rate, $clip),
+  ['u', 'update start to current position', lambda { update_start($clip) } ],
+  ['c', 'print clip settings', lambda { print_clip($clip); } ],
+  ['p', 'play clip', lambda { print_clip($clip); play_clip($clip) } ],
+  ['l', 'loop clip', lambda { puts "Hit Ctrl-C to stop loop"; loop_clip($clip) } ],
+  ['q', 'quit', lambda { puts "no-op" } ],
+  ['?', 'show menu', lambda { display_menu() } ],
+].map do |c, s, lam|
   {
-    letter: s[0],
-    display: "#{s[0]})#{s[1..-1]}",
+    letter: c,
+    display: s,
     action: lam
   }
 end
 
-MENU_OPTIONS = MENU_ITEMS.map { |h| h[:display] }.join(', ')
 MENU_HASH = MENU_ITEMS.map { |h| [ h[:letter], h[:action] ] }.to_h
 
+def display_menu()
+  puts "Options:"
+  MENU_ITEMS.each do |m|
+    puts " #{m[:letter]}: #{m[:display]}"
+  end
+end
 
 
 ######################################
@@ -175,12 +186,12 @@ def main()
       puts "Unknown option '#{user_menu_selection}'"
     end
     puts
-    puts "Menu: #{MENU_OPTIONS}"
+    print "Enter option (#{MENU_ITEMS.map { |m| m[:letter] }.join('') }): "
     user_menu_selection = STDIN.getch
     puts user_menu_selection
   end
 
-  puts "Quitting"
+  puts "Quitting ...\n\n"
 end
 
 ######################################

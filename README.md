@@ -19,14 +19,9 @@ looping at 13 s, play at a rate of 0.2x normal:
 $ ruby quicktime.rb -s 11 -e 13 -r 0.2
 ```
 
-After this, you're shown a menu:
+You can then update the clip using a menu, replay, loop, etc.  See the
+Example.
 
-```
-Menu: s)tart, d)uration, r)ate, p)lay, l)oop, q)uit
-```
-
-and can hit a key to choose to edit the s)tart, d)uration, or r)ate, to
-p)lay the clip, to l)oop it until you hit Ctrl-C, or q)uit.
 
 ### Example
 
@@ -36,43 +31,50 @@ want to work on from the current location in the video:
 ```
 MacBook-Air:Utilities jeff$ ruby quicktime.rb -d 2 -r 1
 Clip: start: 13.51, duration: 2.0, rate: 1.0
-[=> the clip is played here.  Note 13.51 was obtained from the video]
+[the clip is played here.  Note 13.51 was obtained from the video]
 
-Menu: s)tart, d)uration, r)ate, p)lay, l)oop, q)uit
-s
-Clip: start: 13.51, duration: 2.0, rate: 1.0
+Enter option (sdrucplq?): ?
+Options:
+ s: edit start
+ d: edit duration
+ r: edit rate
+ u: update start to current position
+ c: print clip settings
+ p: play clip
+ l: loop clip
+ q: quit
+ ?: show menu
+
+Enter option (sdrucplq?): s
 Enter new start: 14.5
-Clip: start: 14.5, duration: 2.0, rate: 1.0
-[=> clip played with new start point]
 
-Menu: s)tart, d)uration, r)ate, p)lay, l)oop, q)uit
-s
+Enter option (sdrucplq?): p
 Clip: start: 14.5, duration: 2.0, rate: 1.0
+[The clip is played with the above settings]
+
+Enter option (sdrucplq?): s
 Enter new start: 14.7
-Clip: start: 14.7, duration: 2.0, rate: 1.0
-[=> clip played with new start point]
 
-Menu: s)tart, d)uration, r)ate, p)lay, l)oop, q)uit
-d
-Clip: start: 14.7, duration: 2.0, rate: 1.0
+Enter option (sdrucplq?): d
 Enter new duration: 1
-Clip: start: 14.7, duration: 1.0, rate: 1.0
-[=> clip played with new duration]
 
-Menu: s)tart, d)uration, r)ate, p)lay, l)oop, q)uit
-r
+Enter option (sdrucplq?): p
 Clip: start: 14.7, duration: 1.0, rate: 1.0
+[The clip is played with the above settings]
+
+Enter option (sdrucplq?): r
 Enter new rate: 0.5
+
+Enter option (sdrucplq?): p
 Clip: start: 14.7, duration: 1.0, rate: 0.5
-[=> clip played with new playback rate]
+[The clip is played with the above settings]
 
-Menu: s)tart, d)uration, r)ate, p)lay, l)oop, q)uit
-l
+Enter option (sdrucplq?): l
 Hit Ctrl-C to stop loop
-[=> clip loops]
-^CQuitting
+[The clip is loop with the above settings]
+......^C
 
-Menu: s)tart, d)uration, r)ate, p)lay, l)oop, q)uit
-q
-Quitting
+Enter option (sdrucplq?): q
+Quitting ...
+
 ```
