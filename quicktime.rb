@@ -161,8 +161,6 @@ MENU_ITEMS = [
   }
 end
 
-MENU_HASH = MENU_ITEMS.map { |h| [ h[:letter], h[:action] ] }.to_h
-
 def display_menu()
   puts "Options:"
   MENU_ITEMS.each do |m|
@@ -179,9 +177,9 @@ def main()
   user_menu_selection = 'p'
 
   while user_menu_selection != 'q'
-    action = MENU_HASH[user_menu_selection]
-    if !action.nil? then
-      action.call
+    item = MENU_ITEMS.find { |m| m[:letter] == user_menu_selection }
+    if !item.nil? then
+      item[:action].call
     else
       puts "Unknown option '#{user_menu_selection}'"
     end
