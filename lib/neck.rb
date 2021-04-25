@@ -2,7 +2,7 @@ module Music
   NOTE_NAMES = [
     ['A'],
     ['A#', 'Bb'],
-    ['B'],
+    ['B', 'Cb' ],
     ['C'],
     ['C#', 'Db'],
     ['D'],
