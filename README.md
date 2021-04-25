@@ -8,6 +8,18 @@ Midi only tested on OSX.
 
 *IMPORTANT* open GarageBand before running this!
 
+Check if midi is working ok:
+
+```
+$ ruby find_note.rb test
+```
+
+Run the code:
+
+```
+$ ruby find_note.rb
+```
+
 ## quicktime.rb
 
 Will only work on OSX.

@@ -65,44 +65,63 @@ class Question
 end
 
 
-###################################
+# Main loop.
 
-puts "Reading base file"
-h = YAML.load_file('find_note.yaml')
-persistent = h[:persistent].map do |q|
-  Question.new(q[:string].to_i, q[:note])
-end
-# puts persistent.inspect
-
-print "Enter notes to study: "
-NOTES = gets.split(' ')
-print "Enter strings: "
-STRINGS = gets.split(' ')
-
-questions = []
-NOTES.each do |n|
-  STRINGS.each do |s|
-    3.times { |i| questions << Question.new(s.to_i, n) }
+def main()
+  puts "Reading base file"
+  h = YAML.load_file('find_note.yaml')
+  persistent = h[:persistent].map do |q|
+    Question.new(q[:string].to_i, q[:note])
   end
-end
-questions += persistent * 3
-questions.shuffle!
+  # puts persistent.inspect
 
-Voice.say("Get ready!")
-Kernel.sleep 3
+  print "Enter notes to study: "
+  notes = gets.split(' ')
+  print "Enter strings: "
+  strings = gets.split(' ')
 
-n = 0
-neck = Guitar::Neck.new()
-questions.each do |q|
-  n = n+1
-  puts "(#{n} of #{questions.size})"
-  puts q.to_s
-  Voice.say(q.to_s())
-  puts
+  questions = []
+  notes.each do |n|
+    strings.each do |s|
+      3.times { |i| questions << Question.new(s.to_i, n) }
+    end
+  end
+  questions += persistent * 3
+  questions.shuffle!
+
+  Voice.say("Get ready!")
   Kernel.sleep 3
-  # Voice.say(neck.fret(q.string, q.note))
-  play(neck, q.string, q.note)
+
+  n = 0
+  neck = Guitar::Neck.new()
+  questions.each do |q|
+    n = n+1
+    puts "(#{n} of #{questions.size})"
+    puts q.to_s
+    Voice.say(q.to_s())
+    puts
+    Kernel.sleep 3
+    # Voice.say(neck.fret(q.string, q.note))
+    play(neck, q.string, q.note)
+    Kernel.sleep 1
+  end
+
+  Voice.say("All done!")  
+end
+
+
+def test_sound()
+  puts "\nTesting midi -- you should hear a note.\n\n"
+  neck = Guitar::Neck.new()
+  play(neck, 3, "Db")
   Kernel.sleep 1
 end
 
-Voice.say("All done!")  
+###################################
+# Entry point
+
+if (ARGV.size == 0)
+  main()
+else
+  test_sound()
+end

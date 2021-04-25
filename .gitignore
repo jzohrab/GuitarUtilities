@@ -2,3 +2,5 @@ Gemfile.lock
 
 # ignore user settings
 find_note.yaml
+
+.DS_Store
