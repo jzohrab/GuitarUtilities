@@ -77,17 +77,21 @@ def main()
 
   print "Enter notes to study: "
   notes = gets.split(' ')
-  print "Enter strings: "
-  strings = gets.split(' ')
+  # print "Enter strings: "
+  # strings = gets.split(' ')
+  strings = [1, 2, 3, 4, 5, 6]
 
-  questions = []
+  qs = []
   notes.each do |n|
     strings.each do |s|
-      3.times { |i| questions << Question.new(s.to_i, n) }
+      qs << Question.new(s.to_i, n)
     end
   end
-  questions += persistent * 3
-  questions.shuffle!
+  qs += persistent
+  qs.shuffle!
+
+  questions = qs + qs + qs
+  puts questions.inspect
 
   Voice.say("Get ready!")
   Kernel.sleep 3
