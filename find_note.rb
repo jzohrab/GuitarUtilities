@@ -91,7 +91,7 @@ def main()
   qs.shuffle!
 
   questions = qs + qs + qs
-  puts questions.inspect
+  # puts questions.inspect
 
   Voice.say("Get ready!")
   Kernel.sleep 3
