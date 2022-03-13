@@ -3,6 +3,7 @@
 # midi.
 
 require 'yaml'
+require 'date'
 require 'unimidi'
 require_relative 'lib/neck'
 
@@ -65,6 +66,40 @@ class Question
 end
 
 
+def get_notes(user_enters = true)
+  if (user_enters) then
+    print "Enter notes to study: "
+    notes = gets.split(' ')
+    return notes
+  end
+
+  # Otherwise, cycle through the following sets over the year:
+  sets = [
+    ['C', 'G'],
+    ['D', 'A'],
+    ['E', 'B'],
+    ['F', 'C'],
+    ['G', 'D'],
+    ['A', 'E'],
+    ['B', 'F#'],
+    ['Cb', 'Gb'],
+    ['Db', 'Ab'],
+    ['Eb', 'Bb'],
+    ['Gb', 'Db'],
+    ['Ab', 'Eb'],
+    ['Bb', 'F'],
+    ['C#', 'G#'],
+    ['D#', 'A#'],
+    ['G#', 'D#'],
+    ['A#', 'E#']
+  ]
+  n = Date.today.yday()
+  # puts n
+  # puts sets.size
+  curr_index = n / sets.size
+  return sets[curr_index]
+end
+
 # Main loop.
 
 def main()
@@ -75,8 +110,7 @@ def main()
   end
   # puts persistent.inspect
 
-  print "Enter notes to study: "
-  notes = gets.split(' ')
+  notes = get_notes(h[:userinput] || false)
   # print "Enter strings: "
   # strings = gets.split(' ')
   strings = [1, 2, 3, 4, 5, 6]
@@ -88,8 +122,10 @@ def main()
     end
   end
   qs += persistent
-  qs.shuffle!
+  puts "Testing the following: "
+  puts qs.map { |q| q.to_s() }.join(', ')
 
+  qs.shuffle!
   questions = qs + qs + qs
   # puts questions.inspect
 

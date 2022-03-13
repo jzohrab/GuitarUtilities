@@ -1,3 +1,8 @@
+# User should enter which notes to test on command line?
+# If missing or not "true", just cycle through all notes throughout the year,
+# two notes at a time.
+:userinput: true
+
 # Always test the following notes on these strings:
 :persistent:
   - :string: 3
