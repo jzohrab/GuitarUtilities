@@ -66,14 +66,8 @@ class Question
 end
 
 
-def get_notes(user_enters = true)
-  if (user_enters) then
-    print "Enter notes to study: "
-    notes = gets.split(' ')
-    return notes
-  end
-
-  # Otherwise, cycle through the following sets over the year:
+def get_notes(notes_type)
+  # All sets of notes, if cycling through notes.
   sets = [
     ['C', 'G'],
     ['D', 'A'],
@@ -93,11 +87,22 @@ def get_notes(user_enters = true)
     ['G#', 'D#'],
     ['A#', 'E#']
   ]
-  n = Date.today.yday()
-  # puts n
-  # puts sets.size
-  curr_index = n / sets.size
-  return sets[curr_index]
+
+  result = nil
+  case (notes_type)
+  when 'cycle'
+    i = Date.today.yday() / sets.size
+    result = sets[curr_index]
+  when 'input'
+    print "Enter notes to study: "
+    result = gets.split(' ')
+  when 'all'
+    result = sets.flatten.sort.uniq
+  else
+    result = notes_type.split(' ')
+  end
+
+  return result
 end
 
 # Main loop.
@@ -110,7 +115,7 @@ def main()
   end
   # puts persistent.inspect
 
-  notes = get_notes(h[:userinput] || false)
+  notes = get_notes(h[:notes] || 'cycle')
   # print "Enter strings: "
   # strings = gets.split(' ')
   strings = [1, 2, 3, 4, 5, 6]
@@ -123,7 +128,7 @@ def main()
   end
   qs += persistent
   puts "Testing the following: "
-  puts qs.map { |q| q.to_s() }.join(', ')
+  puts qs.map { |q| "#{q.string()} #{q.note()}" }.join(', ')
 
   qs.shuffle!
   questions = qs + qs + qs

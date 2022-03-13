@@ -1,7 +1,10 @@
-# User should enter which notes to test on command line?
-# If missing or not "true", just cycle through all notes throughout the year,
-# two notes at a time.
-:userinput: true
+# Which notes to test:
+# e.g., ':notes: C G' tests C and G
+# Special values:
+#   input    user inputs from command line
+#   all      test all notes
+#   cycle    cycle through pairs of notes throughout the year
+:notes: cycle
 
 # Always test the following notes on these strings:
 :persistent:
