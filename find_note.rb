@@ -2,6 +2,7 @@
 # then the note to find on that string, then "plays" the note using
 # midi.
 
+require 'rubygems'
 require 'yaml'
 require 'date'
 require 'unimidi'
@@ -92,7 +93,7 @@ def get_notes(notes_type)
   case (notes_type)
   when 'cycle'
     i = Date.today.yday() / sets.size
-    result = sets[curr_index]
+    result = sets[i]
   when 'input'
     print "Enter notes to study: "
     result = gets.split(' ')
@@ -109,7 +110,8 @@ end
 
 def main()
   puts "Reading base file"
-  h = YAML.load_file('find_note.yaml')
+  config = File.join(File.dirname(__FILE__), 'find_note.yaml')
+  h = YAML.load_file(config)
   persistent = h[:persistent].map do |q|
     Question.new(q[:string].to_i, q[:note])
   end
