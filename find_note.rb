@@ -92,7 +92,7 @@ def get_notes(notes_type)
   result = nil
   case (notes_type)
   when 'cycle'
-    i = Date.today.yday() / sets.size
+    i = Date.today.yday() % sets.size
     result = sets[i]
   when 'input'
     print "Enter notes to study: "
