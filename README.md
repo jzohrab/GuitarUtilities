@@ -20,6 +20,12 @@ Run the code:
 $ ruby find_note.rb
 ```
 
+TODO: get rid of midi requirement:
+
+* chop the midi tracks to 1 second for notes in range using audacity
+* rename files to include midi number, note name
+* change midi code to use afplay instead
+
 ## quicktime.rb
 
 Will only work on OSX.
